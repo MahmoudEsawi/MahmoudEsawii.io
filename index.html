@@ -1,0 +1,2586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahmoud Al-Esawi | Full-Stack Developer </title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <style>
+        :root {
+            /* Cozy Mode (Default) */
+            --bg-primary: #0f0f17;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #252540;
+            --text-primary: #f5f5f5;
+            --text-secondary: #b8b8d1;
+            --accent: #ff9d00;
+            --accent-secondary: #ff7b00;
+            --glow-color: rgba(255, 157, 0, 0.5);
+            --card-bg: rgba(26, 26, 46, 0.7);
+            --border-color: rgba(255, 157, 0, 0.3);
+            --font-primary: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition-speed: 0.3s;
+        }
+        
+        /* Cyberpunk Mode */
+        [data-theme="cyberpunk"] {
+            --bg-primary: #0a0a12;
+            --bg-secondary: #12121f;
+            --bg-tertiary: #1a1a2e;
+            --text-primary: #e0e0ff;
+            --text-secondary: #a0a0ff;
+            --accent: #ff00ff;
+            --accent-secondary: #00ffff;
+            --glow-color: rgba(255, 0, 255, 0.5);
+            --card-bg: rgba(18, 18, 31, 0.7);
+            --border-color: rgba(255, 0, 255, 0.3);
+        }
+        
+        /* Light Mode */
+        [data-theme="light"] {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --accent: #ff7b00;
+            --accent-secondary: #ff9d00;
+            --glow-color: rgba(255, 123, 0, 0.3);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --border-color: rgba(255, 123, 0, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+        
+        /* Custom Cursor - Optimized for performance */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: none;
+            mix-blend-mode: difference;
+            will-change: transform;
+        }
+        
+        .cursor-follower {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 157, 0, 0.1);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: none;
+            will-change: transform;
+        }
+        
+        .cursor-grow {
+            transform: scale(1.5);
+            background-color: var(--glow-color);
+        }
+        
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 1s ease;
+        }
+        
+        .loader {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+        
+        .loader-circle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .loader-circle:nth-child(2) {
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            border-top-color: var(--accent-secondary);
+            animation-duration: 1s;
+        }
+        
+        .loader-circle:nth-child(3) {
+            width: 40%;
+            height: 40%;
+            top: 30%;
+            left: 30%;
+            border-top-color: var(--text-secondary);
+            animation-duration: 0.5s;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Three.js Canvas */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        /* 3D Interaction Hint */
+        .interaction-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 10px 15px;
+            border-radius: 20px;
+            color: var(--text-primary);
+            font-size: 12px;
+            z-index: 100;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        
+        .interaction-hint:hover {
+            opacity: 1;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: linear-gradient(to bottom, var(--bg-primary), transparent);
+            backdrop-filter: blur(10px);
+            transition: all var(--transition-speed);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition-speed);
+            position: relative;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: width var(--transition-speed);
+        }
+        
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all var(--transition-speed);
+        }
+        
+        .theme-toggle:hover {
+            background-color: var(--glow-color);
+            transform: rotate(180deg);
+        }
+        
+        /* Sections - Centered and Responsive */
+        section {
+            min-height: 100vh;
+            padding: 80px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Hero Section */
+        .hero {
+            position: relative;
+        }
+        
+        .hero-avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            margin: 0 auto 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px var(--glow-color);
+            opacity: 0;
+        }
+        
+        .hero-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--text-primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+        }
+        
+        .hero p {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto 40px;
+            opacity: 0;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            opacity: 0;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all var(--transition-speed);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+            z-index: -1;
+            transition: all var(--transition-speed);
+        }
+        
+        .btn-primary {
+            color: var(--bg-primary);
+            border: none;
+        }
+        
+        .btn-secondary {
+            color: var(--text-primary);
+            border: 2px solid var(--accent);
+            background-color: transparent;
+        }
+        
+        .btn-secondary::before {
+            background: var(--accent);
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover::before {
+            opacity: 0.8;
+        }
+        
+        /* About Section */
+        .terminal {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            max-width: 800px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .terminal-header {
+            background-color: var(--bg-tertiary);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .terminal-button.red {
+            background-color: #ff5f56;
+        }
+        
+        .terminal-button.yellow {
+            background-color: #ffbd2e;
+        }
+        
+        .terminal-button.green {
+            background-color: #27c93f;
+        }
+        
+        .terminal-body {
+            padding: 20px;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            min-height: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            text-align: left;
+        }
+        
+        .terminal-line {
+            margin-bottom: 10px;
+            display: flex;
+        }
+        
+        .terminal-prompt {
+            color: var(--accent);
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+        
+        .terminal-command {
+            flex-grow: 1;
+            word-break: break-word;
+        }
+        
+        .terminal-output {
+            margin-top: 10px;
+            padding-left: 20px;
+            border-left: 2px solid var(--border-color);
+        }
+        
+        .terminal-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background-color: var(--text-primary);
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .terminal-input {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            outline: none;
+            flex-grow: 1;
+        }
+        
+        /* Projects Section */
+        .section-title {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 4px;
+            background-color: var(--accent);
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+            width: 100%;
+        }
+        
+        .project-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all var(--transition-speed);
+            border: 1px solid var(--border-color);
+            position: relative;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(50px);
+            text-align: left;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .project-image {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-speed);
+        }
+        
+        .project-card:hover .project-image img {
+            transform: scale(1.05);
+        }
+        
+        .project-content {
+            padding: 20px;
+        }
+        
+        .project-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+        
+        .project-description {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tech-badge {
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .project-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .project-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color var(--transition-speed);
+        }
+        
+        .project-link:hover {
+            color: var(--accent-secondary);
+        }
+        
+        /* Tech Stack Section */
+        .tech-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .tech-timeline {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 50px 0;
+        }
+        
+        .tech-timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background-color: var(--border-color);
+        }
+        
+        .tech-item {
+            position: relative;
+            margin-bottom: 50px;
+            width: 50%;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .tech-item:nth-child(odd) {
+            left: 0;
+            padding-right: 50px;
+            text-align: right;
+        }
+        
+        .tech-item:nth-child(even) {
+            left: 50%;
+            padding-left: 50px;
+            text-align: left;
+        }
+        
+        .tech-year {
+            position: absolute;
+            top: 0;
+            width: 80px;
+            height: 80px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+        
+        .tech-item:nth-child(odd) .tech-year {
+            right: -40px;
+        }
+        
+        .tech-item:nth-child(even) .tech-year {
+            left: -40px;
+        }
+        
+        .tech-content {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+        }
+        
+        .tech-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+        
+        .tech-description {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        
+        .tech-icons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .tech-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-tertiary);
+            border-radius: 8px;
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+        
+        /* Contact Section */
+        .contact-form {
+            max-width: 600px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-primary);
+            transition: all var(--transition-speed);
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 157, 0, 0.2);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+        
+        .submit-btn {
+            background-color: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            width: 100%;
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--accent-secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* Theme Customizer */
+        .theme-customizer {
+            position: fixed;
+            right: -300px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
+            background-color: var(--bg-secondary);
+            border-radius: 15px 0 0 15px;
+            padding: 20px;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: right var(--transition-speed);
+            border: 1px solid var(--border-color);
+            border-right: none;
+        }
+        
+        .theme-customizer.open {
+            right: 0;
+        }
+        
+        .customizer-toggle {
+            position: absolute;
+            left: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 80px;
+            background-color: var(--accent);
+            border-radius: 10px 0 0 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: var(--bg-primary);
+        }
+        
+        .customizer-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+        
+        .theme-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .theme-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .theme-option input[type="radio"] {
+            display: none;
+        }
+        
+        .theme-option label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .theme-preview {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+        }
+        
+        .theme-preview.cozy {
+            background: linear-gradient(135deg, #ff9d00, #ff7b00);
+        }
+        
+        .theme-preview.cyberpunk {
+            background: linear-gradient(135deg, #ff00ff, #00ffff);
+        }
+        
+        .theme-preview.light {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        }
+        
+        .color-picker {
+            margin-top: 20px;
+        }
+        
+        .color-picker label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .color-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .color-input {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        /* Command Palette */
+        .command-palette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-speed);
+        }
+        
+        .command-palette.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .command-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--bg-secondary);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: translateY(20px);
+            transition: transform var(--transition-speed);
+        }
+        
+        .command-palette.active .command-container {
+            transform: translateY(0);
+        }
+        
+        .command-header {
+            padding: 15px 20px;
+            background-color: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .command-search {
+            flex-grow: 1;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .command-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .command-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+        
+        .command-item:hover,
+        .command-item.active {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .command-item-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .command-item-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Easter Egg */
+        .easter-egg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-speed);
+        }
+        
+        .easter-egg.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .easter-egg-content {
+            background-color: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .easter-egg-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        
+        .easter-egg-description {
+            margin-bottom: 30px;
+            color: var(--text-secondary);
+        }
+        
+        .close-easter-egg {
+            background-color: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+        
+        .close-easter-egg:hover {
+            background-color: var(--accent-secondary);
+        }
+        
+        /* Project Modal */
+        .project-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-speed);
+        }
+        
+        .project-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .project-modal-content {
+            background-color: var(--bg-secondary);
+            border-radius: 15px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .project-modal-header {
+            position: relative;
+            height: 300px;
+            overflow: hidden;
+        }
+        
+        .project-modal-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .project-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 10;
+        }
+        
+        .project-modal-body {
+            padding: 30px;
+        }
+        
+        .project-modal-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        
+        .project-modal-description {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .project-modal-tech {
+            margin-bottom: 30px;
+        }
+        
+        .project-modal-tech h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        
+        .project-modal-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .project-modal-link {
+            padding: 10px 20px;
+            background-color: var(--accent);
+            color: var(--bg-primary);
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all var(--transition-speed);
+        }
+        
+        .project-modal-link:hover {
+            background-color: var(--accent-secondary);
+            transform: translateY(-3px);
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--bg-secondary);
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 15px 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform var(--transition-speed);
+            max-width: 350px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+        
+        .notification-message {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Encryption Animation */
+        .encrypted-text {
+            display: inline-block;
+            font-family: var(--font-mono);
+        }
+        
+        .encrypted-char {
+            display: inline-block;
+            transition: all 0.1s ease;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            section {
+                padding: 60px 15px;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .tech-item {
+                width: 100%;
+                padding-left: 50px !important;
+                padding-right: 0 !important;
+                text-align: left !important;
+            }
+            
+            .tech-timeline::before {
+                left: 20px;
+            }
+            
+            .tech-item:nth-child(odd) .tech-year,
+            .tech-item:nth-child(even) .tech-year {
+                left: -20px !important;
+                right: auto !important;
+            }
+            
+            .tech-item:nth-child(odd) {
+                text-align: left !important;
+            }
+            
+            .theme-customizer {
+                width: 100%;
+                right: -100%;
+                border-radius: 0;
+                border: none;
+            }
+            
+            .customizer-toggle {
+                left: auto;
+                right: 100%;
+                border-radius: 10px 0 0 10px;
+            }
+            
+            .project-modal-content {
+                width: 95%;
+            }
+            
+            .project-modal-header {
+                height: 200px;
+            }
+            
+            .interaction-hint {
+                bottom: 10px;
+                right: 10px;
+                font-size: 10px;
+                padding: 8px 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-avatar {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loader">
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+        </div>
+    </div>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+    
+    <!-- Three.js Canvas Container -->
+    <div id="canvas-container">
+        <canvas id="bg"></canvas>
+    </div>
+    
+    <!-- 3D Interaction Hint -->
+    <div class="interaction-hint">
+        <i class="fas fa-mouse"></i> Move to rotate • Scroll to zoom
+    </div>
+    
+    <!-- Navigation -->
+    <nav>
+        <a href="#" class="logo">
+            <i class="fas fa-code"></i>
+            <span>Mahmoud Al-Esawi</span>
+        </a>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#projects">Projects</a>
+            <a href="#tech">Tech Stack</a>
+            <a href="#contact">Contact</a>
+        </div>
+        <button class="theme-toggle" id="theme-toggle">
+            <i class="fas fa-moon"></i>
+        </button>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            
+            <h1 class="encrypted-text" id="hero-name">Mahmoud Al-Esawi</h1>
+            <p>Building digital experiences with heart—where clean code, smart AI, and real impact meet.</p>
+            <div class="cta-buttons">
+                <a href="#projects" class="btn btn-primary">View My Work <i class="fas fa-arrow-right"></i></a>
+                <a href="#contact" class="btn btn-secondary">Get In Touch <i class="fas fa-envelope"></i></a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- About Section -->
+    <section id="about">
+        <div class="container">
+            <h2 class="section-title">About Me</h2>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-button red"></div>
+                    <div class="terminal-button yellow"></div>
+                    <div class="terminal-button green"></div>
+                </div>
+                <div class="terminal-body" id="terminal-body">
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">visitor@mahmoud:~$</span>
+                        <span class="terminal-command">Welcome to my terminal! Type 'help' for available commands.</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">visitor@mahmoud:~$</span>
+                        <input type="text" class="terminal-input" id="terminal-input" placeholder="Type a command..." autofocus>
+                        <span class="terminal-cursor"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="cta-buttons">
+                <a href="#" class="btn btn-primary" id="download-resume">Download Interactive Résumé <i class="fas fa-download"></i></a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Projects Section -->
+    <section id="projects">
+        <div class="container">
+            <h2 class="section-title">My Projects</h2>
+            <div class="projects-grid">
+                <div class="project-card" data-project="yoweme">
+                    <div class="project-image">
+                        <img src="https://picsum.photos/seed/yoweme/400/200.jpg" alt="YOweMe App">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">YOweMe App</h3>
+                        <p class="project-description">YOweMe is a smart financial assistant app designed to simplify group expense splitting and personal budgeting through AI. Built from the ground up, the app uses Gemini AI to automate receipt scanning, categorize expenses, and provide actionable insights. It features a sleek, modern UI with real-time tracking and secure biometric authentication.</p>
+                        <div class="project-tech">
+                            <span class="tech-badge">Flutter</span>
+                            <span class="tech-badge">.NET Core</span>
+                            <span class="tech-badge">SQL Server</span>
+                            <span class="tech-badge">Gemini AI</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                            <a href="#" class="project-link"><i class="fab fa-github"></i> GitHub</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-card" data-project="fintech">
+                    <div class="project-image">
+                        <img src="https://picsum.photos/seed/fintech/400/200.jpg" alt="Fintech Dashboard">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Eleactronis Store</h3>
+                        <p class="project-description">Developed a modern e-commerce platform tailored for an electronics store, featuring a fully responsive design and dynamic product management. The platform allows admins to manage inventory, view customer orders, and handle transactions, while customers can browse categories, search products, and check out seamlessly.</p>
+                        <div class="project-tech">
+                            <span class="tech-badge">HTML5</span>
+                            <span class="tech-badge">CSS3</span>
+                            <span class="tech-badge">JavaScript</span>
+                            <span class="tech-badge">.NET Core</span>
+                            <span class="tech-badge">MySQL</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                            <a href="#" class="project-link"><i class="fab fa-github"></i> GitHub</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-card" data-project="ecommerce">
+                    <div class="project-image">
+                        <img src="https://picsum.photos/seed/mobile/400/200.jpg" alt="E-commerce Mobile App">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">IEEE CS TTU</h3>
+                        <p class="project-description">Designed and developed the official website for the IEEE Computer Society chapter at Tafila Technical University (TTU). The site serves as a central hub for members, showcasing events, team updates, resources, and opportunities. It reflects the chapter's identity and mission while providing interactive and accessible content for students and faculty.</p>
+                        <div class="project-tech">
+                            <span class="tech-badge">React</span>
+                            <span class="tech-badge">Node.js</span>
+                            <span class="tech-badge">MongoDB</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                            <a href="#" class="project-link"><i class="fab fa-github"></i> GitHub</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Tech Stack Section -->
+    <section id="tech">
+        <div class="container">
+            <h2 class="section-title">Tech Stack</h2>
+            <div class="tech-stack">
+                <div class="tech-timeline">
+                    <div class="tech-item">
+                        <div class="tech-year">2025</div>
+                        <div class="tech-content">
+                            <h3 class="tech-title">Full-Stack Developer</h3>
+                            <p class="tech-description">Developing robust backend services with .NET Core and modern frontend applications.</p>
+                            <div class="tech-icons">
+                                <div class="tech-icon" title="Gemini AI"><i class="fas fa-brain"></i></div>
+                                <div class="tech-icon" title=".NET Core"><i class="fab fa-microsoft"></i></div>
+                                <div class="tech-icon" title="SQL Server"><i class="fas fa-database"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tech-item">
+                        <div class="tech-year">2024</div>
+                        <div class="tech-content">
+                            <h3 class="tech-title">Full-Stack Developer intern </h3>
+                            <p class="tech-description">Developing  with C# .NET Core and modern frontend applications in Future Pack JO and PSTU.</p>
+                            <div class="tech-icons">
+                                <div class="tech-icon" title=".NET Core"><i class="fab fa-microsoft"></i></div>
+                                <div class="tech-icon" title="SQL Server"><i class="fas fa-database"></i></div>
+                                <div class="tech-icon" title="React"><i class="fab fa-react"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+    
+                   
+                    
+                    <div class="tech-item">
+                        <div class="tech-year">2020</div>
+                        <div class="tech-content">
+                            <h3 class="tech-title">Web Development Foundation</h3>
+                            <p class="tech-description">Building responsive websites and web applications with modern JavaScript frameworks.</p>
+                            <div class="tech-icons">
+                                <div class="tech-icon" title="JavaScript"><i class="fab fa-js"></i></div>
+                                <div class="tech-icon" title="HTML5"><i class="fab fa-html5"></i></div>
+                                <div class="tech-icon" title="CSS3"><i class="fab fa-css3-alt"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="container">
+            <h2 class="section-title">Get In Touch</h2>
+            <form class="contact-form" id="contact-form">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Let's Build Together 🚀</button>
+            </form>
+        </div>
+    </section>
+    
+    <!-- Theme Customizer -->
+    <div class="theme-customizer" id="theme-customizer">
+        <div class="customizer-toggle" id="customizer-toggle">
+            <i class="fas fa-palette"></i>
+        </div>
+        <h3 class="customizer-title">Theme Customizer</h3>
+        <div class="theme-options">
+            <div class="theme-option">
+                <input type="radio" id="cozy-theme" name="theme" value="cozy" checked>
+                <label for="cozy-theme">
+                    <div class="theme-preview cozy"></div>
+                    <span>Cozy Mode</span>
+                </label>
+            </div>
+            <div class="theme-option">
+                <input type="radio" id="cyberpunk-theme" name="theme" value="cyberpunk">
+                <label for="cyberpunk-theme">
+                    <div class="theme-preview cyberpunk"></div>
+                    <span>Cyberpunk Mode</span>
+                </label>
+            </div>
+            <div class="theme-option">
+                <input type="radio" id="light-theme" name="theme" value="light">
+                <label for="light-theme">
+                    <div class="theme-preview light"></div>
+                    <span>Light Mode</span>
+                </label>
+            </div>
+        </div>
+        <div class="color-picker">
+            <label>Accent Color</label>
+            <div class="color-inputs">
+                <input type="color" class="color-input" id="primary-color" value="#ff9d00">
+                <input type="color" class="color-input" id="secondary-color" value="#ff7b00">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Command Palette -->
+    <div class="command-palette" id="command-palette">
+        <div class="command-container">
+            <div class="command-header">
+                <i class="fas fa-search"></i>
+                <input type="text" class="command-search" id="command-search" placeholder="Type a command...">
+            </div>
+            <div class="command-list" id="command-list">
+                <div class="command-item" data-command="home">
+                    <div class="command-item-title">Go to Home</div>
+                    <div class="command-item-description">Navigate to the hero section</div>
+                </div>
+                <div class="command-item" data-command="about">
+                    <div class="command-item-title">Go to About</div>
+                    <div class="command-item-description">Learn more about Mahmoud</div>
+                </div>
+                <div class="command-item" data-command="projects">
+                    <div class="command-item-title">Go to Projects</div>
+                    <div class="command-item-description">View Mahmoud's projects</div>
+                </div>
+                <div class="command-item" data-command="tech">
+                    <div class="command-item-title">Go to Tech Stack</div>
+                    <div class="command-item-description">See Mahmoud's technical skills</div>
+                </div>
+                <div class="command-item" data-command="contact">
+                    <div class="command-item-title">Go to Contact</div>
+                    <div class="command-item-description">Get in touch with Mahmoud</div>
+                </div>
+                <div class="command-item" data-command="theme-cozy">
+                    <div class="command-item-title">Enable Cozy Theme</div>
+                    <div class="command-item-description">Switch to cozy mode</div>
+                </div>
+                <div class="command-item" data-command="theme-cyberpunk">
+                    <div class="command-item-title">Enable Cyberpunk Theme</div>
+                    <div class="command-item-description">Switch to cyberpunk mode</div>
+                </div>
+                <div class="command-item" data-command="theme-light">
+                    <div class="command-item-title">Enable Light Theme</div>
+                    <div class="command-item-description">Switch to light mode</div>
+                </div>
+                <div class="command-item" data-command="customizer">
+                    <div class="command-item-title">Open Theme Customizer</div>
+                    <div class="command-item-description">Customize the theme</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Easter Egg -->
+    <div class="easter-egg" id="easter-egg">
+        <div class="easter-egg-content">
+            <h2 class="easter-egg-title">🎉 You found the secret lab!</h2>
+            <p class="easter-egg-description">Welcome to Mahmoud's experimental projects area. This is where the magic happens before it goes public.</p>
+            <button class="close-easter-egg" id="close-easter-egg">Close</button>
+        </div>
+    </div>
+    
+    <!-- Project Modal -->
+    <div class="project-modal" id="project-modal">
+        <div class="project-modal-content">
+            <div class="project-modal-header">
+                <img id="modal-image" src="" alt="">
+                <button class="project-modal-close" id="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="project-modal-body">
+                <h2 class="project-modal-title" id="modal-title"></h2>
+                <p class="project-modal-description" id="modal-description"></p>
+                <div class="project-modal-tech">
+                    <h3>Technologies Used</h3>
+                    <div id="modal-tech"></div>
+                </div>
+                <div class="project-modal-links" id="modal-links"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <div class="notification-title" id="notification-title"></div>
+        <div class="notification-message" id="notification-message"></div>
+    </div>
+    <script>
+        // Console Easter Egg
+        console.log("%cWelcome, code explorer 👾", "font-size: 18px; color: #ff9d00;");
+        
+        // Initialize EmailJS (replace with your actual user ID)
+        (function() {
+            emailjs.init("YOUR_USER_ID"); // Replace with your EmailJS user ID
+        })();
+        
+        // Loading Screen
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loading-screen');
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    // Scroll to top to ensure page loads at the top
+                    window.scrollTo(0, 0);
+                    // Start animations after loading
+                    startHeroAnimations();
+                    initThreeJS();
+                }, 1000);
+            }, 1500);
+        });
+        
+        // Optimized Mouse Movement
+        const cursor = document.querySelector('.cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+        
+        // Use requestAnimationFrame for smooth cursor movement
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+        let followerX = 0, followerY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+        
+        // Smooth cursor animation
+        function animateCursor() {
+            // Direct cursor movement
+            cursorX += (mouseX - cursorX) * 0.2;
+            cursorY += (mouseY - cursorY) * 0.2;
+            cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
+            
+            // Follower with delay
+            followerX += (mouseX - followerX) * 0.1;
+            followerY += (mouseY - followerY) * 0.1;
+            cursorFollower.style.transform = `translate(${followerX}px, ${followerY}px)`;
+            
+            requestAnimationFrame(animateCursor);
+        }
+        
+        animateCursor();
+        
+        // Mouse down effects
+        document.addEventListener('mousedown', () => {
+            cursor.classList.add('cursor-grow');
+            cursorFollower.classList.add('cursor-grow');
+        });
+        
+        document.addEventListener('mouseup', () => {
+            cursor.classList.remove('cursor-grow');
+            cursorFollower.classList.remove('cursor-grow');
+        });
+        
+        // Three.js Background - Using the 3D animation from the provided code
+        let scene, camera, renderer, particles, torus, lights = [];
+        let isDarkTheme = true;
+        let currentTheme = 'cozy';
+        
+        function initThreeJS() {
+            // Scene setup
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x0f0f17, 0.002);
+            
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+            
+            // Renderer setup
+            const canvas = document.getElementById('bg');
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: canvas, 
+                alpha: true,
+                antialias: true 
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            
+            // Create torus knot
+            const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+            const material = new THREE.MeshStandardMaterial({ 
+                color: 0xff9d00,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.7
+            });
+            torus = new THREE.Mesh(geometry, material);
+            scene.add(torus);
+            
+            // Create particle system
+            createParticles();
+            
+            // Create lights
+            createLights();
+            
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize);
+            
+            // Mouse movement for camera control
+            document.addEventListener('mousemove', onMouseMove);
+            
+            // Scroll for zoom
+            document.addEventListener('wheel', onMouseWheel);
+            
+            // Start animation
+            animate();
+        }
+        
+        function createParticles() {
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCnt = 5000;
+            
+            const posArray = new Float32Array(particlesCnt * 3);
+            
+            for(let i = 0; i < particlesCnt * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 100;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.05,
+                color: 0x8b5cf6,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            
+            particles = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particles);
+        }
+        
+        function createLights() {
+            // Ambient light
+            const ambientLight = new THREE.AmbientLight(0x333333, 0.5);
+            scene.add(ambientLight);
+            lights.push(ambientLight);
+            
+            // Point lights
+            const pointLight1 = new THREE.PointLight(0xff9d00, 1, 100);
+            pointLight1.position.set(20, 20, 20);
+            scene.add(pointLight1);
+            lights.push(pointLight1);
+            
+            const pointLight2 = new THREE.PointLight(0x8b5cf6, 1, 100);
+            pointLight2.position.set(-20, -20, -20);
+            scene.add(pointLight2);
+            lights.push(pointLight2);
+        }
+        
+        function updateSceneColors(theme) {
+            if (!torus || !particles || !lights.length) return;
+            
+            let torusColor, particleColor, light1Color, light2Color, fogColor;
+            
+            switch(theme) {
+                case 'cozy':
+                    torusColor = 0xff9d00;
+                    particleColor = 0x8b5cf6;
+                    light1Color = 0xff9d00;
+                    light2Color = 0x8b5cf6;
+                    fogColor = 0x0f0f17;
+                    break;
+                case 'cyberpunk':
+                    torusColor = 0xff00ff;
+                    particleColor = 0x00ffff;
+                    light1Color = 0xff00ff;
+                    light2Color = 0x00ffff;
+                    fogColor = 0x0a0a12;
+                    break;
+                case 'light':
+                    torusColor = 0x007aff;
+                    particleColor = 0x007aff;
+                    light1Color = 0x007aff;
+                    light2Color = 0x8b5cf6;
+                    fogColor = 0xf8f9fa;
+                    break;
+            }
+            
+            // Update torus material
+            torus.material.color.set(torusColor);
+            
+            // Update particles material
+            particles.material.color.set(particleColor);
+            
+            // Update lights
+            lights[0].color.set(theme === 'light' ? 0xffffff : 0x333333);
+            lights[0].intensity = theme === 'light' ? 0.8 : 0.5;
+            
+            lights[1].color.set(light1Color);
+            lights[2].color.set(light2Color);
+            
+            // Update fog
+            scene.fog.color.set(fogColor);
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        function onMouseMove(event) {
+            const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            // Smooth camera movement
+            camera.position.x += (mouseX * 5 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 5 - camera.position.y) * 0.05;
+            
+            // Make camera look at the center
+            camera.lookAt(scene.position);
+        }
+        
+        function onMouseWheel(event) {
+            // Zoom in/out with mouse wheel
+            camera.position.z += event.deltaY * 0.05;
+            
+            // Limit zoom range
+            camera.position.z = Math.max(10, Math.min(50, camera.position.z));
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotate torus
+            torus.rotation.x += 0.002;
+            torus.rotation.y += 0.003;
+            
+            // Rotate particles
+            particles.rotation.x += 0.0005;
+            particles.rotation.y += 0.001;
+            
+            // Move lights in circular motion
+            const time = Date.now() * 0.001;
+            lights[1].position.x = Math.sin(time * 0.7) * 30;
+            lights[1].position.z = Math.cos(time * 0.5) * 30;
+            
+            lights[2].position.x = Math.cos(time * 0.3) * 30;
+            lights[2].position.z = Math.sin(time * 0.4) * 30;
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Scroll-based 3D movement
+        let ticking = false;
+        function updateScroll() {
+            const scrollY = window.scrollY;
+            const scrollPercent = scrollY / (document.body.scrollHeight - window.innerHeight);
+            
+            if (torus) {
+                torus.rotation.x = scrollPercent * Math.PI * 2;
+                torus.rotation.y = scrollPercent * Math.PI;
+            }
+            
+            if (particles) {
+                particles.rotation.x = scrollPercent * Math.PI;
+                particles.rotation.y = scrollPercent * Math.PI;
+            }
+            
+            ticking = false;
+        }
+        
+        function requestTick() {
+            if (!ticking) {
+                window.requestAnimationFrame(updateScroll);
+                ticking = true;
+            }
+        }
+        
+        window.addEventListener('scroll', requestTick);
+        
+        // Hero Animations
+        function startHeroAnimations() {
+            // Animate name with encryption effect
+            const heroName = document.getElementById('hero-name');
+            const nameText = heroName.textContent;
+            heroName.textContent = '';
+            
+            // Create spans for each character
+            for (let i = 0; i < nameText.length; i++) {
+                const span = document.createElement('span');
+                span.className = 'encrypted-char';
+                span.textContent = nameText[i] === ' ' ? ' ' : getRandomChar();
+                heroName.appendChild(span);
+            }
+            
+            // Animate each character
+            const chars = heroName.querySelectorAll('.encrypted-char');
+            chars.forEach((char, index) => {
+                setTimeout(() => {
+                    // Create encryption effect
+                    let counter = 0;
+                    const targetChar = nameText[index];
+                    const interval = setInterval(() => {
+                        char.textContent = getRandomChar();
+                        counter++;
+                        
+                        if (counter > 10) {
+                            clearInterval(interval);
+                            char.textContent = targetChar;
+                        }
+                    }, 50);
+                }, index * 100);
+            });
+            
+            // Show name after animation
+            setTimeout(() => {
+                gsap.to('#hero-name', {
+                    duration: 0.5,
+                    opacity: 1,
+                    ease: 'power3.out'
+                });
+            }, 100);
+            
+            // Animate description
+            gsap.to('.hero p', {
+                duration: 1,
+                y: 0,
+                opacity: 1,
+                delay: 1.5,
+                ease: 'power3.out'
+            });
+            
+            // Animate CTA buttons
+            gsap.to('.cta-buttons', {
+                duration: 1,
+                y: 0,
+                opacity: 1,
+                delay: 2,
+                ease: 'power3.out'
+            });
+        }
+        
+        // Get random character for encryption effect
+        function getRandomChar() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
+            return chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        
+        // Check for saved theme preference or default to 'cozy'
+        currentTheme = localStorage.getItem('theme') || 'cozy';
+        body.setAttribute('data-theme', currentTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            let newTheme;
+            
+            if (currentTheme === 'cozy') {
+                newTheme = 'cyberpunk';
+            } else if (currentTheme === 'cyberpunk') {
+                newTheme = 'light';
+            } else {
+                newTheme = 'cozy';
+            }
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Update 3D scene colors
+            updateSceneColors(newTheme);
+        });
+        
+        // Theme Customizer
+        const customizerToggle = document.getElementById('customizer-toggle');
+        const themeCustomizer = document.getElementById('theme-customizer');
+        
+        customizerToggle.addEventListener('click', () => {
+            themeCustomizer.classList.toggle('open');
+        });
+        
+        // Theme Options
+        const themeOptions = document.querySelectorAll('input[name="theme"]');
+        
+        themeOptions.forEach(option => {
+            option.addEventListener('change', () => {
+                const selectedTheme = option.value;
+                body.setAttribute('data-theme', selectedTheme);
+                localStorage.setItem('theme', selectedTheme);
+                
+                // Update 3D scene colors
+                updateSceneColors(selectedTheme);
+            });
+        });
+        
+        // Color Picker
+        const primaryColorInput = document.getElementById('primary-color');
+        const secondaryColorInput = document.getElementById('secondary-color');
+        
+        primaryColorInput.addEventListener('change', (e) => {
+            document.documentElement.style.setProperty('--accent', e.target.value);
+            if (torus && lights[1]) {
+                torus.material.color.set(e.target.value);
+                lights[1].color.set(e.target.value);
+            }
+        });
+        
+        secondaryColorInput.addEventListener('change', (e) => {
+            document.documentElement.style.setProperty('--accent-secondary', e.target.value);
+            if (lights[2]) {
+                lights[2].color.set(e.target.value);
+            }
+        });
+        
+        // Terminal Commands
+        const terminalInput = document.getElementById('terminal-input');
+        const terminalBody = document.getElementById('terminal-body');
+        
+        // Focus on terminal input when terminal is visible
+        terminalInput.focus();
+        
+        terminalInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const command = terminalInput.value.trim();
+                if (command) {
+                    processCommand(command);
+                    terminalInput.value = '';
+                }
+            }
+        });
+        
+        function processCommand(command) {
+            const commandLine = document.createElement('div');
+            commandLine.className = 'terminal-line';
+            commandLine.innerHTML = `
+                <span class="terminal-prompt">visitor@mahmoud:~$</span>
+                <span class="terminal-command">${command}</span>
+            `;
+            
+            const output = document.createElement('div');
+            output.className = 'terminal-output';
+            
+            // Convert command to lowercase for case-insensitive matching
+            const cmd = command.toLowerCase();
+            
+            if (cmd === 'help') {
+                output.innerHTML = `
+                    <p>Available commands:</p>
+                    <p>help - Show this help message</p>
+                    <p>about or about mahmoud - Information about Mahmoud</p>
+                    <p>project or projects - Show projects</p>
+                    <p>tech or tech stack - Show tech stack</p>
+                    <p>contact - Get contact information</p>
+                    <p>clear - Clear terminal</p>
+                    <p>resume - Download resume</p>
+                `;
+            } else if (cmd === 'about' || cmd === 'about mahmoud') {
+                output.innerHTML = `
+                    <p>I'm a Full-Stack Engineer with a passion for creating innovative solutions . I specialize in .NET Core for backend services, and AI integration to build smarter applications.</p>
+                    <p>As the founder of YOweMe App, I'm building an AI-powered expense-splitting solution that simplifies financial management for groups and individuals.</p>
+                `;
+            } else if (cmd === 'project' || cmd === 'projects') {
+                output.innerHTML = `
+                    <p><strong>YOweMe App</strong> - AI-powered expense splitting and financial management application for groups and individuals.</p>
+                    <p><strong>Electronis Store </strong> - Real-time financial data visualization dashboard with predictive analytics using AI.</p>
+                    <p><strong>IEEE CS TTU </strong> - Cross-platform e-commerce mobile application with real-time inventory and payment processing.</p>
+                    <p>Type 'tech' to see the technologies used in these projects.</p>
+                `;
+            } else if (cmd === 'tech' || cmd === 'tech stack') {
+                output.innerHTML = `
+                    <div class="tech-icons">
+                        <div class="tech-icon" title="Flutter"><i class="fab fa-flutter"></i></div>
+                        <div class="tech-icon" title=".NET Core"><i class="fab fa-microsoft"></i></div>
+                        <div class="tech-icon" title="SQL Server"><i class="fas fa-database"></i></div>
+                        <div class="tech-icon" title="Firebase"><i class="fas fa-fire"></i></div>
+                        <div class="tech-icon" title="Gemini AI"><i class="fas fa-brain"></i></div>
+                    </div>
+                    <p>My tech stack includes mobile development with Flutter and Dart, backend services with .NET Core, database management with SQL Server, and AI integration with Gemini.</p>
+                `;
+            } else if (cmd === 'contact') {
+                output.innerHTML = `
+                    <p><strong>Email:</strong> Esawi@ieee.org</p>
+                    <p><strong>LinkedIn:</strong> https://www.linkedin.com/in/mahmoud-esawi </p>
+                    <p><strong>GitHub:</strong> https://github.com/MahmoudEsawi </p>
+                    <p><strong>Location:</strong> Amman, Jordan</p>
+                    <p><strong>Phone:</strong> +962 7 7955 8033</p>
+                    <p>Feel free to reach out for collaborations or inquiries!</p>
+                `;
+            } else if (cmd === 'clear') {
+                // Clear all but the last input line
+                const lines = terminalBody.querySelectorAll('.terminal-line, .terminal-output');
+                lines.forEach(line => {
+                    if (!line.querySelector('.terminal-input')) {
+                        line.remove();
+                    }
+                });
+                return;
+            } else if (cmd === 'resume') {
+                output.innerHTML = `<p>Downloading resume...</p>`;
+                // Trigger actual download
+                downloadResume();
+            } else {
+                output.innerHTML = `<p>Command not found: ${command}. Type 'help' for available commands.</p>`;
+            }
+            
+            // Add command line and output to terminal
+            terminalBody.insertBefore(commandLine, terminalInput.parentElement);
+            terminalBody.insertBefore(output, terminalInput.parentElement);
+            
+            // Scroll to bottom
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+            
+            // Focus back on input
+            terminalInput.focus();
+        }
+        
+        // Download Resume Function
+        function downloadResume() {
+            // Create a simple PDF content (in a real implementation, this would be a real PDF)
+            const resumeContent = `
+                Mahmoud Al-Esawi - Full-Stack Developer 
+                
+                CONTACT INFORMATION
+                Email: Esawi@ieee.org
+                LinkedIn: https://www.linkedin.com/in/mahmoud-esawi
+                GitHub: https://github.com/MahmoudEsawi
+                Phone: +962 7 7955 8033
+                Location: Amman, Jordan
+                
+                SUMMARY
+                Full-Stack Engineer with a passion for creating innovative solutions 
+                and enhancing user experiences through technology.
+                web applications, and AI integration.
+                Specializing in .NET Core for backend services, and AI integration.
+                
+                EXPERIENCE
+                2025-Present: Founder & Lead Developer - YOweMe App
+                - Building AI-powered expense splitting and financial management application
+                - Integrating Gemini AI for enhanced functionality
+                
+                2025: Full-Stack Developer Intern - Future Pack Jo - PSUT 
+                - Developed and maintained web applications using React and .NET Core
+                - Implemented real-time data visualization dashboards
+                
+                2020-2021: Junior Developer - Startup Incubator
+                - Built responsive websites Contributed to building early-stage web apps using HTML/CSS
+                - Collaborated with cross-functional teams
+                
+                🛠 Skills
+                •	Frontend: HTML5, CSS3, SCSS, JavaScript, React
+                •	Backend: .NET Core, REST APIs, C#
+                •	Database: MySQL, SQL Server , mongoDB
+                •	AI/ML: Gemini AI, Python (basic), TensorFlow (beginner)
+                •	DevOps & Tools: Git, Postman, Swagger, Azure
+                
+                EDUCATION
+                Bachelor's Degree in Computer Engineering 
+                Tafila Technical University , 2021-2026
+            `;
+            
+            // Create a Blob with the content
+            const blob = new Blob([resumeContent], { type: 'text/plain' });
+            
+            // Create a download link
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Mahmoud_Al-Esawi_Resume.txt';
+            document.body.appendChild(a);
+            a.click();
+            
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 0);
+            
+            // Show notification
+            showNotification('Success', 'Resume downloaded successfully!');
+        }
+        
+        // Download Resume Button
+        const downloadResumeBtn = document.getElementById('download-resume');
+        
+        downloadResumeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            downloadResume();
+        });
+        
+        // Project Modal
+        const projectModal = document.getElementById('project-modal');
+        const modalClose = document.getElementById('modal-close');
+        const modalImage = document.getElementById('modal-image');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDescription = document.getElementById('modal-description');
+        const modalTech = document.getElementById('modal-tech');
+        const modalLinks = document.getElementById('modal-links');
+        
+        // Project data
+        const projectsData = {
+            yoweme: {
+                title: 'YOweMe App',
+                image: 'https://picsum.photos/seed/yoweme/800/400.jpg',
+                description: 'YOweMe is an AI-powered expense splitting and financial management application designed for groups and individuals. The app uses advanced AI algorithms to automatically categorize expenses, suggest fair splitting methods, and provide insights into spending patterns. Built with Flutter for cross-platform compatibility and .NET Core for robust backend services, YOweMe simplifies financial management for everyone.',
+                tech: ['Flutter', 'Dart', '.NET Core', 'SQL Server', 'Gemini AI', 'Firebase'],
+                links: [
+                    { text: 'Live Demo', url: '#', icon: 'fas fa-external-link-alt' },
+                    { text: 'GitHub', url: '#', icon: 'fab fa-github' },
+                    { text: 'App Store', url: '#', icon: 'fab fa-apple' },
+                    { text: 'Play Store', url: '#', icon: 'fab fa-google-play' }
+                ]
+            },
+            fintech: {
+                title: 'Fintech Analytics Dashboard',
+                image: 'https://picsum.photos/seed/fintech/800/400.jpg',
+                description: 'A comprehensive financial analytics dashboard that provides real-time data visualization and predictive analytics for financial institutions. The dashboard processes large volumes of financial data to generate actionable insights, detect anomalies, and forecast trends. Built with React for the frontend and .NET Core for the backend, with Firebase for real-time data synchronization.',
+                tech: ['React', '.NET Core', 'Firebase', 'Chart.js', 'SQL Server', 'Azure'],
+                links: [
+                    { text: 'Live Demo', url: '#', icon: 'fas fa-external-link-alt' },
+                    { text: 'GitHub', url: '#', icon: 'fab fa-github' },
+                    { text: 'Documentation', url: '#', icon: 'fas fa-book' }
+                ]
+            },
+            ecommerce: {
+                title: 'E-commerce Mobile App',
+                image: 'https://picsum.photos/seed/mobile/800/400.jpg',
+                description: 'A cross-platform e-commerce mobile application that provides a seamless shopping experience across iOS and Android devices. The app features real-time inventory management, secure payment processing with Stripe, and personalized recommendations based on user behavior. Built with Flutter for the mobile frontend and Node.js with MongoDB for the backend.',
+                tech: ['Flutter', 'Dart', 'Node.js', 'MongoDB', 'Stripe API', 'Firebase'],
+                links: [
+                    { text: 'Live Demo', url: '#', icon: 'fas fa-external-link-alt' },
+                    { text: 'GitHub', url: '#', icon: 'fab fa-github' },
+                    { text: 'App Store', url: '#', icon: 'fab fa-apple' },
+                    { text: 'Play Store', url: '#', icon: 'fab fa-google-play' }
+                ]
+            }
+        };
+        
+        // Open project modal
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const projectId = card.getAttribute('data-project');
+                const project = projectsData[projectId];
+                
+                if (project) {
+                    modalImage.src = project.image;
+                    modalTitle.textContent = project.title;
+                    modalDescription.textContent = project.description;
+                    
+                    // Clear and populate tech badges
+                    modalTech.innerHTML = '';
+                    project.tech.forEach(tech => {
+                        const badge = document.createElement('span');
+                        badge.className = 'tech-badge';
+                        badge.textContent = tech;
+                        modalTech.appendChild(badge);
+                    });
+                    
+                    // Clear and populate links
+                    modalLinks.innerHTML = '';
+                    project.links.forEach(link => {
+                        const a = document.createElement('a');
+                        a.href = link.url;
+                        a.className = 'project-modal-link';
+                        a.innerHTML = `<i class="${link.icon}"></i> ${link.text}`;
+                        modalLinks.appendChild(a);
+                    });
+                    
+                    projectModal.classList.add('active');
+                }
+            });
+        });
+        
+        // Close project modal
+        modalClose.addEventListener('click', () => {
+            projectModal.classList.remove('active');
+        });
+        
+        // Close modal when clicking outside
+        projectModal.addEventListener('click', (e) => {
+            if (e.target === projectModal) {
+                projectModal.classList.remove('active');
+            }
+        });
+        
+        // Contact Form
+        const contactForm = document.getElementById('contact-form');
+        const submitBtn = contactForm.querySelector('.submit-btn');
+        
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Disable submit button to prevent multiple submissions
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            
+            // Get form data
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value
+            };
+            
+            // Send email using EmailJS
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', formData)
+                .then(function(response) {
+                    // Show success notification
+                    showNotification('Success', 'Your message has been sent successfully!');
+                    
+                    // Reset form
+                    contactForm.reset();
+                    
+                    // Re-enable submit button
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Let\'s Build Together 🚀';
+                }, function(error) {
+                    // Show error notification
+                    showNotification('Error', 'Failed to send your message. Please try again.');
+                    
+                    // Re-enable submit button
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Let\'s Build Together 🚀';
+                });
+        });
+        
+        // Notification Function
+        function showNotification(title, message) {
+            const notification = document.getElementById('notification');
+            const notificationTitle = document.getElementById('notification-title');
+            const notificationMessage = document.getElementById('notification-message');
+            
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            notification.classList.add('show');
+            
+            // Hide notification after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Command Palette
+        const commandPalette = document.getElementById('command-palette');
+        const commandSearch = document.getElementById('command-search');
+        const commandItems = document.querySelectorAll('.command-item');
+        let activeCommandIndex = 0;
+        
+        // Open command palette with Cmd/Ctrl+K
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                commandPalette.classList.add('active');
+                commandSearch.focus();
+                activeCommandIndex = 0;
+                updateActiveCommand();
+            }
+            
+            // Close command palette with Escape
+            if (e.key === 'Escape' && commandPalette.classList.contains('active')) {
+                commandPalette.classList.remove('active');
+                commandSearch.value = '';
+            }
+            
+            // Navigate commands with arrow keys
+            if (commandPalette.classList.contains('active')) {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    activeCommandIndex = (activeCommandIndex + 1) % commandItems.length;
+                    updateActiveCommand();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    activeCommandIndex = (activeCommandIndex - 1 + commandItems.length) % commandItems.length;
+                    updateActiveCommand();
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    executeCommand(commandItems[activeCommandIndex].getAttribute('data-command'));
+                }
+            }
+        });
+        
+        // Filter commands based on search
+        commandSearch.addEventListener('input', () => {
+            const searchTerm = commandSearch.value.toLowerCase();
+            
+            commandItems.forEach(item => {
+                const title = item.querySelector('.command-item-title').textContent.toLowerCase();
+                const description = item.querySelector('.command-item-description').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Reset active index to first visible item
+            const visibleItems = Array.from(commandItems).filter(item => item.style.display !== 'none');
+            if (visibleItems.length > 0) {
+                activeCommandIndex = commandItems.indexOf(visibleItems[0]);
+                updateActiveCommand();
+            }
+        });
+        
+        // Execute command on click
+        commandItems.forEach(item => {
+            item.addEventListener('click', () => {
+                executeCommand(item.getAttribute('data-command'));
+            });
+        });
+        
+        function updateActiveCommand() {
+            commandItems.forEach((item, index) => {
+                if (index === activeCommandIndex) {
+                    item.classList.add('active');
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+        
+        function executeCommand(command) {
+            commandPalette.classList.remove('active');
+            commandSearch.value = '';
+            
+            switch (command) {
+                case 'home':
+                    document.getElementById('home').scrollIntoView({ behavior: 'smooth' });
+                    break;
+                case 'about':
+                    document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+                    break;
+                case 'projects':
+                    document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
+                    break;
+                case 'tech':
+                    document.getElementById('tech').scrollIntoView({ behavior: 'smooth' });
+                    break;
+                case 'contact':
+                    document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+                    break;
+                case 'theme-cozy':
+                    body.setAttribute('data-theme', 'cozy');
+                    localStorage.setItem('theme', 'cozy');
+                    updateSceneColors('cozy');
+                    break;
+                case 'theme-cyberpunk':
+                    body.setAttribute('data-theme', 'cyberpunk');
+                    localStorage.setItem('theme', 'cyberpunk');
+                    updateSceneColors('cyberpunk');
+                    break;
+                case 'theme-light':
+                    body.setAttribute('data-theme', 'light');
+                    localStorage.setItem('theme', 'light');
+                    updateSceneColors('light');
+                    break;
+                case 'customizer':
+                    themeCustomizer.classList.add('open');
+                    break;
+            }
+        }
+        
+        // Easter Egg - Konami Code
+        let konamiCode = [];
+        const konamiCodeSequence = [
+            'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+            'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+            'b', 'a'
+        ];
+        
+        document.addEventListener('keydown', (e) => {
+            konamiCode.push(e.key);
+            
+            if (konamiCode.length > konamiCodeSequence.length) {
+                konamiCode.shift();
+            }
+            
+            if (JSON.stringify(konamiCode) === JSON.stringify(konamiCodeSequence)) {
+                // Activate easter egg
+                document.getElementById('easter-egg').classList.add('active');
+                konamiCode = [];
+            }
+        });
+        
+        // Close Easter Egg
+        document.getElementById('close-easter-egg').addEventListener('click', () => {
+            document.getElementById('easter-egg').classList.remove('active');
+        });
+        
+        // GSAP Animations with ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Fix project section animations
+        gsap.utils.toArray('.project-card').forEach((card, i) => {
+            gsap.to(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 80%',
+                    toggleActions: 'play none none none'
+                },
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                delay: i * 0.2,
+                ease: 'power3.out'
+            });
+        });
+        
+        // Fix tech stack animations
+        gsap.utils.toArray('.tech-item').forEach((item, i) => {
+            gsap.to(item, {
+                scrollTrigger: {
+                    trigger: item,
+                    start: 'top 80%',
+                    toggleActions: 'play none none none'
+                },
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                delay: i * 0.2,
+                ease: 'power3.out'
+            });
+        });
+        
+        // Fix contact form animation
+        gsap.to('.contact-form', {
+            scrollTrigger: {
+                trigger: '.contact-form',
+                start: 'top 80%',
+                toggleActions: 'play none none none'
+            },
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power3.out'
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
